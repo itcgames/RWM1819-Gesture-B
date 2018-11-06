@@ -1,4 +1,7 @@
 /*! p1C00204864 v0.0.0 - MIT license */
+
+// Liam Hickey
+
 'use strict';
 
 class GestureManager
