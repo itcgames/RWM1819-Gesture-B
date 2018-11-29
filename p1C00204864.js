@@ -17,7 +17,11 @@ class GestureManager
     this.doubleTapThresholdMs = 1000;
     this.doubleTapCallback = function() { /* Empty Function */ };
     this.longTouchCallback = function() { /* Empty Function */ };
+    this.touchStartCallbackUser = function(e) { /*console.log(e); console.log("start");*/ };
+    this.touchMoveCallbackUser = function(e) { /*console.log(e); console.log("move");*/ };
+    this.touchEndCallbackUser = function(e) { /*console.log(e); console.log("end");*/ };
     document.addEventListener("touchstart", this.touchStartCallback.bind(this), {passive:false});
+
     document.addEventListener("touchend", this.touchEndCallback.bind(this), {passive:false})
     if(this.debug)
     {
@@ -29,6 +33,7 @@ class GestureManager
   touchStartCallback(e)
   {
     e.preventDefault();
+    this.touchStartCallbackUser(e);
     var touchX = e.touches[0].clientX;
     var touchY = e.touches[0].clientY;
     this.touchDetected = true;
@@ -60,6 +65,7 @@ class GestureManager
   touchEndCallback(e)
   {
     e.preventDefault();
+    this.touchEndCallbackUser(e);
     var touchEndTime = new Date().getTime();
     if(touchEndTime > this.lastTouchTime + this.longTouchThresholdMs)
     {
