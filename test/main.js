@@ -16,12 +16,17 @@ function main()
     console.log("Long Touch Detected");
   };
   gestureManager.touchStartCallbackUser = function(e) {
-    console.log(e.touches[0]);
+    console.log("touchstart")
   };
-  document.addEventListener("touchmove", function (e) {console.log(e.touches[0]);}, {passive:false});
+  document.addEventListener("touchmove", function (e) {
+    console.log("touchmove")
+  }, {passive:false});
   gestureManager.touchEndCallbackUser = function(e) {
     console.log("End");
   };
+  gestureManager.pinchCallback = function() {
+    
+  }
 }
 
 /**

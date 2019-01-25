@@ -16,10 +16,24 @@ class GestureManager
     this.touchCount = 0;
     this.touches = [];
 
+    this.swipeStarted = false;
+    this.swipeStartTime = 0;
+    this.swipeStartX = 0;
+    this.swipeStartY = 0;
+    this.pinchStarted = false;
+    this.pinchStartTime = 0;
+    this.pinchStartPos1 = {x: 0, y: 0};
+    this.pinchStartPos2 = {x: 0, y: 0};
+
     // User Defined Callback Thresholds
     this.longTouchThresholdMs = 2000;
     this.doubleTapThresholdMs = 1000;
     this.touchCountCallbackThreshold = 2;
+    this.swipeDistanceThreshold = 150;
+    this.swipeTimeThresholdMs = 500;
+    this.pinchDistanceThresholdMin = 400;
+    this.pinchDistanceThresholdMax = 450;
+    this.pinchTimeThresholdMs = 1000;
 
     // User Defined Callbacks
     this.doubleTapCallback = function() { /* Empty Function */ };
@@ -41,6 +55,10 @@ class GestureManager
   {
     e.preventDefault();
     this.touchStartCallbackUser(e);
+    var touchStartTime = new Date().getTime();
+    var touchX = e.touches[0].clientX;
+    var touchY = e.touches[0].clientY;
+    this.touchDetected = true;
 
     // Manage Recorded Touches
     this.touches = [];
@@ -51,14 +69,44 @@ class GestureManager
 
     // Manage Touch Count
     this.touchCount = e.touches.length;
-    if(this.touchCount > this.touchCountCallbackThreshold) {
+    if(this.touchCount === this.touchCountCallbackThreshold) 
+    {
       this.touchCountCallback();
     }
 
-    var touchX = e.touches[0].clientX;
-    var touchY = e.touches[0].clientY;
-    this.touchDetected = true;
-    var touchStartTime = new Date().getTime();
+    // Swipe Code
+    if(this.touchCount === 1)
+    {
+      if(!this.swipeStarted)
+      {
+        this.swipeStartX = e.touches[0].clientX;
+        this.swipeStartY = e.touches[0].clientY;
+        this.swipeStartTime = touchStartTime;
+      }
+      this.swipeStarted = true;
+    }
+    else
+    {
+      this.swipeStarted = false;
+    }
+
+    // Pinch Code
+    if(this.touchCount === 2)
+    {
+      this.pinchStartPos1 = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+      this.pinchStartPos2 = {x: e.touches[1].clientX, y: e.touches[1].clientY};
+      if(this.getDistanceBetweenTouches(this.pinchStartPos1.x, this.pinchStartPos1.y, 
+        this.pinchStartPos2.x, this.pinchStartPos2.y) >= this.pinchDistanceThresholdMax)
+      {
+        if(!this.pinchStarted)
+        {
+          this.pinchStartTime = touchStartTime;
+        }
+        this.pinchStarted = true; 
+      }
+    }
+    
+    // Double Tap Code
     if(touchStartTime < this.lastTouchTime + this.doubleTapThresholdMs)
     {
       this.doubleTapDetetcted = true;
@@ -77,6 +125,8 @@ class GestureManager
     this.lastTouchTime = touchStartTime;
     this.lastTouchPosX = touchX;
     this.lastTouchPosY = touchY;
+
+    // Debug
     if(this.debug)
     {
       console.log("DEBUG - Touch Start");
@@ -86,10 +136,31 @@ class GestureManager
   touchMoveCallback(e) {
     e.preventDefault();
     this.touchMoveCallbackUser();
+    var touchMoveTime = new Date().getTime();
+
+    // Manage Touches
     this.touches = [];
     for (var i = 0; i < e.touches.length; i++) 
     {
       this.touches.push({x: e.touches[i].clientX, y: e.touches[i].clientY})
+    }
+
+    // Manage Swipe Detection
+    if(this.swipeStarted 
+      && this.getDistanceBetweenTouches(e.touches[0].clientX, e.touches[0].clientY, this.swipeStartX, this.swipeStartY) > this.swipeDistanceThreshold
+      && (this.swipeStartTime + this.swipeTimeThresholdMs) > touchMoveTime)
+    {
+      this.swipeCallback();
+      this.swipeStarted = false;
+    }
+
+    // Manage Pinch Detection
+    if(this.pinchStarted
+      && this.getDistanceBetweenTouches(e.touches[0].clientX, e.touches[0].clientY, e.touches[1].clientX, e.touches[1].clientY,) < this.pinchDistanceThresholdMin
+      )
+    {
+      this.pinchCallback();
+      this.pinchStarted = false;
     }
   }
 
@@ -97,6 +168,10 @@ class GestureManager
   {
     e.preventDefault();
     this.touchEndCallbackUser(e);
+
+    this.pinchStarted = false;
+    this.swipeStarted = false;
+
     this.touches = [];
     for (var i = 0; i < e.touches.length; i++) 
     {
