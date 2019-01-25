@@ -16,6 +16,12 @@ class GestureManager
     this.touchCount = 0;
     this.touches = [];
 
+    // Point Tracking
+    this.trackPoints = false;
+    this.pointCount = 0;
+    this.points = [];
+
+    // Gestures
     this.swipeStarted = false;
     this.swipeStartTime = 0;
     this.swipeStartX = 0;
@@ -79,8 +85,8 @@ class GestureManager
     {
       if(!this.swipeStarted)
       {
-        this.swipeStartX = e.touches[0].clientX;
-        this.swipeStartY = e.touches[0].clientY;
+        this.swipeStartX = touchX;
+        this.swipeStartY = touchY;
         this.swipeStartTime = touchStartTime;
       }
       this.swipeStarted = true;
@@ -126,6 +132,13 @@ class GestureManager
     this.lastTouchPosX = touchX;
     this.lastTouchPosY = touchY;
 
+    // Point Tracking Code
+    if(this.trackPoints)
+    {
+      this.points.push({x: touchX, y: touchY});
+      this.pointCount--;
+    }
+
     // Debug
     if(this.debug)
     {
@@ -161,6 +174,17 @@ class GestureManager
     {
       this.pinchCallback();
       this.pinchStarted = false;
+    }
+
+    // Point Tracking Code
+    if(this.trackPoints && this.pointCount > 0)
+    {
+      this.points.push({x: e.touches[0].clientX, y: e.touches[0].clientY});
+      this.pointCount--;
+    }
+    else
+    {
+      this.trackPoints = false;
     }
   }
 
@@ -213,7 +237,30 @@ class GestureManager
     return this.touchCount;
   }
 
-  getAllTouches() {
+  getAllTouches() 
+  {
     return this.touches;
+  }
+
+  beginTrackPoints(pointCount) 
+  {
+    this.trackPoints = true;
+    this.pointCount = pointCount;
+    this.points = [];
+  }
+
+  getTrackedPoints() 
+  {
+    return this.points;
+  }
+
+  clearTrackedPoints()
+  {
+    this.points = [];
+  }
+
+  isTrackingComplete()
+  {
+    return (!this.trackPoints);
   }
 }
