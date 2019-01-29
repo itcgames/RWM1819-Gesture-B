@@ -7,11 +7,33 @@ describe('p1C00204864()', function () {
     expect(GestureManager).to.be.a('function');
   });
 
-  it('Can check for touch start event', function () {
+  it('touch start exists', function() {
     var gestureManager = new GestureManager(true);
-    expect(gestureManager.debug).to.equal(true); // Check that debug mode is actually set
-    expect(gestureManager.getTouchStatus()).to.equal(false); // Check that a touch isn't being registered
-    document.getElementById("test-div").click();
-    expect(gestureManager.getTouchStatus()).to.equal(true); // Check that we captured the event
+    expect(gestureManager.touchStartCallback).to.be.a('function');
+  });
+  
+  it('touch move exists', function() {
+    var gestureManager = new GestureManager(true);
+    expect(gestureManager.touchMoveCallback).to.be.a('function');
+  });
+
+  it('touch end exists', function() {
+    var gestureManager = new GestureManager(true);
+    expect(gestureManager.touchEndCallback).to.be.a('function');
+  });
+
+  it('distance check functions correctly', function(){
+    var gestureManager = new GestureManager(true);
+    expect(gestureManager.getDistanceBetweenTouches).to.be.a('function');
+    expect(gestureManager.getDistanceBetweenTouches(1,1,2,1)).to.equal(1);
+    expect(gestureManager.getDistanceBetweenTouches(1,1,1,1)).to.equal(0);
+    expect(gestureManager.getDistanceBetweenTouches(-5,1,5,1)).to.equal(10);
+    expect(gestureManager.getDistanceBetweenTouches(1,5,1,-5)).to.equal(10);
+  });
+
+  it('false touch detected', function(){
+    var gestureManager = new GestureManager(true);
+    expect(gestureManager.getTouchStatus).to.be.a('function');
+    expect(gestureManager.getTouchStatus()).to.equal(false);
   });
 });

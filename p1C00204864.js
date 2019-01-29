@@ -1,9 +1,13 @@
-// Liam Hickey
+// Liam Hickey - C00204864
 
 'use strict';
 
 class GestureManager
 {
+  /**
+   * Constructor for Gesture Manager
+   * @param {bool - debug status} debugIn 
+   */
   constructor(debugIn)
   {
     this.debug = debugIn === true; // Handles whatever the user passes
@@ -57,6 +61,10 @@ class GestureManager
     document.addEventListener("touchend", this.touchEndCallback.bind(this), {passive:false});
   }
 
+  /**
+   * Callback that is triggered when a new touch is detected
+   * @param {event - touch start event} e 
+   */
   touchStartCallback(e)
   {
     e.preventDefault();
@@ -146,6 +154,10 @@ class GestureManager
     }
   }
 
+  /**
+   * Callback that is triggered when an existing touch point is moved
+   * @param {event - touch move event} e 
+   */
   touchMoveCallback(e) {
     e.preventDefault();
     this.touchMoveCallbackUser();
@@ -188,6 +200,10 @@ class GestureManager
     }
   }
 
+  /**
+   * Callback function that is triggered when a touch point is removed
+   * @param {event - touch end event} e 
+   */
   touchEndCallback(e)
   {
     e.preventDefault();
@@ -223,25 +239,45 @@ class GestureManager
     }
   }
 
+  /**
+   * Simple function used to get distance between two points
+   * @param {float - number representing point 1 X} x1 
+   * @param {float - number representing point 1 Y} y1 
+   * @param {float - number representing point 2 X} x2 
+   * @param {float - number representing point 2 Y} y2 
+   */
   getDistanceBetweenTouches(x1, y1, x2, y2)
   {
     return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
   }
 
+  /**
+   * Function returns whether the screen is currently being touhed whatsoever
+   */
   getTouchStatus()
   {
     return this.touchDetected;
   }
 
+  /**
+   * Function returns the number of touch points currently touching the screen
+   */
   getTouchCount() {
     return this.touchCount;
   }
 
+  /**
+   * Returns the X and Y of all points
+   */
   getAllTouches() 
   {
     return this.touches;
   }
 
+  /**
+   * Function used to begin tracking points
+   * @param {integer - number of points to track} pointCount 
+   */
   beginTrackPoints(pointCount) 
   {
     this.trackPoints = true;
@@ -249,16 +285,25 @@ class GestureManager
     this.points = [];
   }
 
+  /**
+   * Function used to get all the tracked points
+   */
   getTrackedPoints() 
   {
     return this.points;
   }
 
+  /**
+   * Function used to clear all the tracked points thus far
+   */
   clearTrackedPoints()
   {
     this.points = [];
   }
 
+  /**
+   * Function returns whether point tracking is complete
+   */
   isTrackingComplete()
   {
     return (!this.trackPoints);
